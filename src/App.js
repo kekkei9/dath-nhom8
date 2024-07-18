@@ -1,6 +1,6 @@
 import logo from "./logo.svg";
 import "./App.css";
-import Task1 from "./components/task9";
+import Task1 from "./components/Task1/Task1";
 import Task2 from "./components/task9";
 import Task3 from "./components/task9";
 import Task4 from "./components/task9";
