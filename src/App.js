@@ -1,10 +1,29 @@
+import logo from "./logo.svg";
 import "./App.css";
-import BarChart from "./charts/BarChart";
+import Task1 from "./components/task9";
+import Task2 from "./components/task9";
+import Task3 from "./components/task9";
+import Task4 from "./components/task9";
+import Task5 from "./components/task9";
+import Task6 from "./components/task9";
+import Task7 from "./components/task9";
+import Task8 from "./components/task9";
+import Task9 from "./components/task8";
+import Task10 from "./components/task9";
 
 function App() {
   return (
     <div className="App">
-      <BarChart />
+      <Task1 />
+      <Task2 />
+      <Task3 />
+      <Task4 />
+      <Task5 />
+      <Task6 />
+      <Task7 />
+      <Task8 />
+      <Task9 />
+      <Task10 />
     </div>
   );
 }

@@ -1,0 +1,14 @@
+.bar {
+  fill-opacity: 0.7;
+}
+.bar:hover {
+  fill-opacity: 1;
+}
+.axis-label {
+  font-size: 12px;
+}
+.label {
+  font-size: 12px;
+  font-weight: bold;
+  text-anchor: middle;
+}
