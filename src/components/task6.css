@@ -1,0 +1,48 @@
+.chart-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start; /* Căn theo chiều dọc bên trên */
+    flex-wrap: wrap; /* Cho phép wrap nếu không đủ chỗ */
+    margin-top: 20px;
+}
+
+.chart {
+    width: 400px; 
+    height: 400px; 
+    text-align: center; /* Căn giữa nội dung */
+}
+
+.chart text {
+    font-size: 12px;
+    text-anchor: middle;
+}
+
+.chart-title {
+    font-size: 18px;
+    text-align: center; /* Căn giữa tiêu đề */
+}
+
+.legend {
+    text-align: center;
+    margin-top: 40px; /* Khoảng cách từ biểu đồ đến chú thích */
+}
+
+.legend-item {
+    display: inline-block;
+    margin-right: 10px; /* Khoảng cách giữa các mục chú thích */
+    margin-bottom: 10px; /* Khoảng cách giữa các hàng trong chú thích */
+}
+
+.legend-color {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 5px; /* Khoảng cách giữa màu sắc và văn bản */
+    vertical-align: middle;
+}
+
+.title {
+    text-align: center;
+    font-size: 20px;
+    margin-bottom: 20px;
+}

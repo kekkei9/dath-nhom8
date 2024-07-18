@@ -1,0 +1,11 @@
+.bar {
+    fill: steelblue;
+}
+.axis-label {
+    font-size: 14px;
+}
+.title {
+    text-anchor: middle;
+    font-size: 20px;
+    margin-bottom: 20px;
+}
