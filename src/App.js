@@ -6,7 +6,7 @@ import Task3 from "./components/task9";
 import Task4 from "./components/task9";
 import Task5 from "./components/task9";
 import Task6 from "./components/task9";
-import Task7 from "./components/task9";
+import Task7 from "./components/Task7/Task7";
 import Task8 from "./components/task9";
 import Task9 from "./components/task8";
 import Task10 from "./components/task9";
