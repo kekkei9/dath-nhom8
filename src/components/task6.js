@@ -1,109 +1,119 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import * as d3 from 'd3';
 import './task6.css';
 
-const data = [
-    { category: 'Grade 0', listen_music: 0, count: 86 },
-    { category: 'Grade 1', listen_music: 0, count: 199 },
-    { category: 'Grade 2', listen_music: 0, count: 318 },
-    { category: 'Grade 3', listen_music: 0, count: 333 },
-    { category: 'Grade 4', listen_music: 0, count: 985 },
-    { category: 'Grade 0', listen_music: 1, count: 21 },
-    { category: 'Grade 1', listen_music: 1, count: 70 },
-    { category: 'Grade 2', listen_music: 1, count: 73 },
-    { category: 'Grade 3', listen_music: 1, count: 81 },
-    { category: 'Grade 4', listen_music: 1, count: 226 }
-];
+const StackedBarChart = () => {
+    useEffect(() => {
+        // Dữ liệu mẫu
+        const data = [
+            { group: 'Không nghe nhạc', grade0: 86, grade1: 199, grade2: 318, grade3: 333, grade4: 985 },
+            { group: 'Nghe nhạc', grade0: 21, grade1: 70, grade2: 73, grade3: 81, grade4: 226 }
+        ];
 
-const PieChart = () => {
-    const pieChartRef1 = useRef();
-    const pieChartRef2 = useRef();
+        // Chuyển đổi dữ liệu để tính tỷ lệ phần trăm
+        data.forEach(d => {
+            const total = d.grade0 + d.grade1 + d.grade2 + d.grade3 + d.grade4;
+            d.grade0 = (d.grade0 / total) * 100;
+            d.grade1 = (d.grade1 / total) * 100;
+            d.grade2 = (d.grade2 / total) * 100;
+            d.grade3 = (d.grade3 / total) * 100;
+            d.grade4 = (d.grade4 / total) * 100;
+        });
 
-    const drawPieChart = (container, listen_music, title) => {
-        const filteredData = data.filter(d => d.listen_music === listen_music);
-        const width = 400;
-        const height = 400;
-        const radius = Math.min(width, height) / 2;
+        const svgWidth = 600;
+        const svgHeight = 400;
+        const margin = { top: 50, right: 30, bottom: 80, left: 50 };
+
+        const width = svgWidth - margin.left - margin.right;
+        const height = svgHeight - margin.top - margin.bottom;
+
+        const svg = d3.select('#stacked-bar-chart')
+            .attr('width', svgWidth)
+            .attr('height', svgHeight);
+
+        svg.selectAll('*').remove(); // Xóa nội dung cũ nếu có
+
+        svg.append('text')
+            .attr('class', 'title')
+            .attr('x', svgWidth / 2)
+            .attr('y', margin.top / 2)
+            .text('Tỷ lệ phần trăm điểm số theo nhóm');
+
+        const chart = svg.append('g')
+            .attr('transform', `translate(${margin.left}, ${margin.top})`);
+
+        const x = d3.scaleBand()
+            .domain(data.map(d => d.group))
+            .range([0, width])
+            .padding(0.7);
+
+        const y = d3.scaleLinear()
+            .domain([0, 100])
+            .nice()
+            .range([height, 0]);
+
+        chart.append('g')
+            .attr('transform', `translate(0, ${height})`)
+            .call(d3.axisBottom(x))
+            .selectAll('text')
+            .attr('class', 'axis-label');
+
+        chart.append('g')
+            .call(d3.axisLeft(y).ticks(5).tickFormat(d => d + '%'))
+            .selectAll('text')
+            .attr('class', 'axis-label');
 
         const color = d3.scaleOrdinal()
-            .domain(data.map(d => d.category))
+            .domain(['grade0', 'grade1', 'grade2', 'grade3', 'grade4'])
             .range(['#ff7f0e', '#1f77b4', '#2ca02c', '#d62728', '#9467bd']);
 
-        const pie = d3.pie()
-            .value(d => d.count);
+        const stack = d3.stack()
+            .keys(['grade0', 'grade1', 'grade2', 'grade3', 'grade4']);
 
-        const arc = d3.arc()
-            .innerRadius(0)
-            .outerRadius(radius);
+        const series = stack(data);
 
-        const svg = d3.select(container)
-            .append("svg")
-            .attr("width", width)
-            .attr("height", height)
-            .append("g")
-            .attr("transform", `translate(${width / 2}, ${height / 2})`);
-
-        svg.append("text")
-            .attr("class", "chart-title")
-            .attr("text-anchor", "middle")
-            .text(title);
-
-        const arcs = svg.selectAll("arc")
-            .data(pie(filteredData))
+        chart.selectAll('.serie')
+            .data(series)
             .enter()
-            .append("g")
-            .attr("class", "arc");
+            .append('g')
+            .attr('class', 'serie')
+            .attr('fill', d => color(d.key))
+            .selectAll('rect')
+            .data(d => d)
+            .enter()
+            .append('rect')
+            .attr('x', d => x(d.data.group))
+            .attr('y', d => y(d[1]))
+            .attr('height', d => y(d[0]) - y(d[1]))
+            .attr('width', x.bandwidth());
 
-        arcs.append("path")
-            .attr("fill", d => color(d.data.category))
-            .attr("d", arc);
+        const legend = d3.select('#legend');
 
-        arcs.append("text")
-            .attr("transform", d => `translate(${arc.centroid(d)})`)
-            .attr("text-anchor", "middle")
-            .text(d => `${(d.data.count / d3.sum(filteredData, d => d.count) * 100).toFixed(2)}%`);
-    };
+        ['grade0', 'grade1', 'grade2', 'grade3', 'grade4'].forEach((key, i) => {
+            const legendItem = legend.append('div')
+                .attr('class', 'legend-item');
 
-    useEffect(() => {
-        drawPieChart(pieChartRef1.current, 0, "Không nghe nhạc");
-        drawPieChart(pieChartRef2.current, 1, "Có nghe nhạc");
+            legendItem.append('span')
+                .attr('class', 'color-box')
+                .style('background-color', color(key));
+
+            legendItem.append('span')
+                .attr('class', 'label')
+                .text(key);
+        });
+
     }, []);
 
     return (
-        <div>
-            <div className="title">Tỉ lệ phân loại điểm theo việc nghe nhạc</div>
-            <div className="chart-container">
-                <div className="chart">
-                    <div ref={pieChartRef1} className="chart-title">Không nghe nhạc</div>
-                </div>
-                <div className="chart">
-                    <div ref={pieChartRef2} className="chart-title">Có nghe nhạc</div>
-                </div>
-            </div>
-            <div className="legend">
-                <div className="legend-item">
-                    <div className="legend-color" style={{ backgroundColor: '#ff7f0e' }}></div>
-                    Grade 0
-                </div>
-                <div className="legend-item">
-                    <div className="legend-color" style={{ backgroundColor: '#1f77b4' }}></div>
-                    Grade 1
-                </div>
-                <div className="legend-item">
-                    <div className="legend-color" style={{ backgroundColor: '#2ca02c' }}></div>
-                    Grade 2
-                </div>
-                <div className="legend-item">
-                    <div className="legend-color" style={{ backgroundColor: '#d62728' }}></div>
-                    Grade 3
-                </div>
-                <div className="legend-item">
-                    <div className="legend-color" style={{ backgroundColor: '#9467bd' }}></div>
-                    Grade 4
-                </div>
+        <div id="chart-container">
+            <svg id="stacked-bar-chart"></svg>
+            <div className="legend" id="legend"></div>
+            <div className="text-info">
+                <p>Không nghe nhạc: Grade 0: 4.48%; Grade 1: 10.36%; Grade 2: 16.55%; Grade 3: 17.33%; Grade 4: 51.28%</p>
+                <p>Có nghe nhạc: Grade 0: 4.46%; Grade 1: 14.86%; Grade 2: 15.50%; Grade 3: 17.20%; Grade 4: 47.98%</p>
             </div>
         </div>
     );
 };
 
-export default PieChart;
+export default StackedBarChart;
