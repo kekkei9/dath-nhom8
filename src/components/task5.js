@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
-import './SportsBarChart.css';
+import './task3.css';
 
 const data = [
     { category: 'Chơi', listen_music: 0, count: 1.986380882 },
