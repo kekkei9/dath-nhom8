@@ -1,0 +1,9 @@
+.content {
+  display: grid;
+  width: 800px;
+  grid-template-columns: auto;
+  margin-left: auto;
+  margin-right: auto;
+  justify-content: center;
+  place-items: center;
+}
