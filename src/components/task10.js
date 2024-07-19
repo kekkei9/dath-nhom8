@@ -2,18 +2,18 @@ import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
 import "./task10.css";
 
+// Dữ liệu mẫu
+const data = [
+  { enthnicity: "African American", averageParentalSupport: 2.0507 },
+  { enthnicity: "Caucasian", averageParentalSupport: 2.1201 },
+  { enthnicity: "Asian", averageParentalSupport: 2.1638 },
+  { enthnicity: "Other", averageParentalSupport: 2.2027 },
+];
+
 const Task10 = () => {
   const svgRef = useRef();
 
   useEffect(() => {
-    // Dữ liệu mẫu
-    const data = [
-      { enthnicity: 1, averageParentalSupport: 2.0507 },
-      { enthnicity: 0, averageParentalSupport: 2.1201 },
-      { enthnicity: 2, averageParentalSupport: 2.1638 },
-      { enthnicity: 3, averageParentalSupport: 2.2027 },
-    ];
-
     // Kích thước của SVG và margin
     const svgWidth = 600;
     const svgHeight = 400;
