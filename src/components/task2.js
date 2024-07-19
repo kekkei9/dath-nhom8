@@ -262,7 +262,7 @@ const Task2 = () => {
     <div>
       <h2>
         Task 2: Việc tham gia hoạt động ngoại khóa hay không ảnh hưởng thế nào
-        tới xếp loại của học sinh theo độ tuổi
+        tới xếp loại của học sinh
       </h2>
       <svg ref={svgRef}></svg>
       <div id="legend" ref={legendRef}></div>
