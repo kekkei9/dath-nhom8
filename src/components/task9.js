@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from 'react';
-import * as d3 from 'd3';
-import './task9.css';
+import React, { useEffect, useRef } from "react";
+import * as d3 from "d3";
+import "./task9.css";
 
 const data = [
   { age: "15", absences: 9167 },
@@ -26,13 +26,13 @@ const Task9 = () => {
 
     const x = d3
       .scaleBand()
-      .domain(data.map(d => d.age))
+      .domain(data.map((d) => d.age))
       .rangeRound([0, width])
       .padding(0.1);
 
     const y = d3
       .scaleLinear()
-      .domain([0, d3.max(data, d => d.absences)])
+      .domain([0, d3.max(data, (d) => d.absences)])
       .nice()
       .rangeRound([height, 0]);
 
@@ -53,10 +53,10 @@ const Task9 = () => {
       .enter()
       .append("rect")
       .attr("class", "bar")
-      .attr("x", d => x(d.age))
-      .attr("y", d => y(d.absences))
+      .attr("x", (d) => x(d.age))
+      .attr("y", (d) => y(d.absences))
       .attr("width", x.bandwidth())
-      .attr("height", d => height - y(d.absences))
+      .attr("height", (d) => height - y(d.absences))
       .attr("fill", "steelblue");
 
     svg
@@ -85,9 +85,9 @@ const Task9 = () => {
       .enter()
       .append("text")
       .attr("class", "label")
-      .attr("x", d => x(d.age) + x.bandwidth() / 2)
-      .attr("y", d => y(d.absences) - 5)
-      .text(d => d.absences)
+      .attr("x", (d) => x(d.age) + x.bandwidth() / 2)
+      .attr("y", (d) => y(d.absences) - 5)
+      .text((d) => d.absences)
       .attr("text-anchor", "middle");
 
     return () => {
@@ -97,7 +97,7 @@ const Task9 = () => {
 
   return (
     <div>
-      <h2>Tổng số buổi vắng theo độ tuổi</h2>
+      <h2>Task 9: Tổng số buổi vắng theo độ tuổi</h2>
       <svg ref={svgRef}></svg>
     </div>
   );

@@ -129,7 +129,7 @@ const Task8 = () => {
 
   return (
     <div>
-      <h2>Tỉ lệ chơi thể thao giữa nam và nữ</h2>
+      <h2>Task 8: Tỉ lệ chơi thể thao giữa nam và nữ</h2>
       <svg ref={svgRef}></svg>
       <div id="legend" ref={legendRef}></div>
       <div id="notes" ref={notesRef}></div>
