@@ -1,143 +1,261 @@
-import React, { useEffect, useRef } from "react";
+import React, { cloneElement, useEffect, useRef } from "react";
 import * as d3 from "d3";
 import "./task2.css";
-
-const data = [
-  { age: 15, withExtracurricular: 2.8699, withoutExtracurricular: 3.0781 },
-  { age: 16, withExtracurricular: 2.8326, withoutExtracurricular: 3.0819 },
-  { age: 17, withExtracurricular: 2.9005, withoutExtracurricular: 3.0301 },
-  { age: 18, withExtracurricular: 2.9005, withoutExtracurricular: 3.0162 },
-];
+import dataSource from "../Dataset/Student_performance_data _.csv";
+import Chart from "./Task1/Chart";
 
 const Task2 = () => {
   const svgRef = useRef();
   const legendRef = useRef();
-  const notesRef = useRef();
 
   useEffect(() => {
-    const svgRefStore = svgRef.current;
-    const legendRefStore = legendRef.current;
-    const notesRefStore = notesRef.current;
-    const margin = { top: 20, right: 30, bottom: 100, left: 60 };
-    const width = 600 - margin.left - margin.right;
-    const height = 400 - margin.top - margin.bottom;
+    const drawChart = async () => {
+      const rawData = await d3.csv(dataSource);
 
-    const svg = d3
-      .select(svgRef.current)
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
+      const data = [];
+      data.push({
+        Extracurricular: "1",
+        GradeClass: "0.0",
+        numberStudent: 0,
+      });
+      data.push({
+        Extracurricular: "0",
+        GradeClass: "0.0",
+        numberStudent: 0,
+      });
+      data.push({
+        Extracurricular: "1",
+        GradeClass: "1.0",
+        numberStudent: 0,
+      });
+      data.push({
+        Extracurricular: "0",
+        GradeClass: "1.0",
+        numberStudent: 0,
+      });
+      data.push({
+        Extracurricular: "1",
+        GradeClass: "2.0",
+        numberStudent: 0,
+      });
+      data.push({
+        Extracurricular: "0",
+        GradeClass: "2.0",
+        numberStudent: 0,
+      });
+      data.push({
+        Extracurricular: "1",
+        GradeClass: "3.0",
+        numberStudent: 0,
+      });
+      data.push({
+        Extracurricular: "0",
+        GradeClass: "3.0",
+        numberStudent: 0,
+      });
+      data.push({
+        Extracurricular: "1",
+        GradeClass: "4.0",
+        numberStudent: 0,
+      });
+      data.push({
+        Extracurricular: "0",
+        GradeClass: "4.0",
+        numberStudent: 0,
+      });
+      for (const item of rawData) {
+        const existingItem = data.find((r) => {
+          return (
+            r.Extracurricular === item.Extracurricular &&
+            r.GradeClass === item.GradeClass
+          );
+        });
 
-    const x = d3
-      .scaleBand()
-      .domain(data.map((d) => d.age))
-      .rangeRound([0, width])
-      .padding(0.1);
+        if (existingItem) {
+          // Nếu đã có đối tượng tương ứng, tăng số lượng học sinh lên 1
+          existingItem.numberStudent++;
+        } else {
+          // Nếu chưa có, tạo đối tượng mới và thêm vào mảng
+          data.push({
+            Extracurricular: item.Extracurricular,
+            GradeClass: item.GradeClass,
+            numberStudent: 1,
+          });
+        }
+      }
 
-    const y = d3
-      .scaleLinear()
-      .domain([
-        0,
-        d3.max(data, (d) => d.withExtracurricular + d.withoutExtracurricular),
-      ])
-      .nice()
-      .rangeRound([height, 0]);
+      // Specify the chart’s dimensions (except for the height).
+      const width = 800;
+      const marginTop = 70;
+      const marginRight = 10;
+      const marginBottom = 45;
+      const marginLeft = 50;
 
-    const xAxis = d3.axisBottom(x);
-    const yAxis = d3.axisLeft(y).ticks(5);
+      // Determine the series that need to be stacked.
+      const series = d3
+        .stack()
+        .keys(d3.union(data.map((d) => d.GradeClass))) // distinct series keys, in input order
+        .value(([, D], key) => D.get(key).numberStudent) // get value for each series key and stack
+        .offset(d3.stackOffsetExpand)(
+        d3.index(
+          data,
+          (d) => d.Extracurricular,
+          (d) => d.GradeClass
+        )
+      ); // group by stack then series key
 
-    svg
-      .append("g")
-      .attr("class", "x axis")
-      .attr("transform", `translate(0,${height})`)
-      .call(xAxis);
+      // Compute the height from the number of stacks.
+      const height = series[0].length * 40 + marginTop + marginBottom;
 
-    svg.append("g").attr("class", "y axis").call(yAxis);
+      // Prepare the scales for positional and color encodings.
+      const x = d3
+        .scaleLinear()
+        .domain([0, d3.max(series, (d) => d3.max(d, (d) => d[1]))])
+        .range([marginLeft, width - marginRight]);
 
-    const barGroups = svg
-      .selectAll(".bar-group")
-      .data(data)
-      .enter()
-      .append("g")
-      .attr("class", "bar-group")
-      .attr("transform", (d) => `translate(${x(d.age)},0)`);
-
-    barGroups
-      .append("rect")
-      .attr("class", "bar with-extracurricular")
-      .attr("x", 0)
-      .attr("y", (d) => y(d.withExtracurricular))
-      .attr("width", x.bandwidth())
-      .attr("height", (d) => height - y(d.withExtracurricular))
-      .attr("fill", "steelblue");
-
-    barGroups
-      .append("rect")
-      .attr("class", "bar without-extracurricular")
-      .attr("x", 0)
-      .attr("y", (d) => y(d.withExtracurricular + d.withoutExtracurricular))
-      .attr("width", x.bandwidth())
-      .attr("height", (d) => height - y(d.withoutExtracurricular))
-      .attr("fill", "orange");
-
-    const legend = d3
-      .select(legendRef.current)
-      .append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", 40)
-      .append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
-
-    legend
-      .append("rect")
-      .attr("x", -20)
-      .attr("y", 0)
-      .attr("width", 18)
-      .attr("height", 18)
-      .attr("fill", "steelblue");
-
-    legend
-      .append("text")
-      .attr("x", 0)
-      .attr("y", 9)
-      .attr("dy", ".35em")
-      .text("Tham gia hoạt động ngoại khóa");
-
-    legend
-      .append("rect")
-      .attr("x", 230)
-      .attr("y", 0)
-      .attr("width", 18)
-      .attr("height", 18)
-      .attr("fill", "orange");
-
-    legend
-      .append("text")
-      .attr("x", 250)
-      .attr("y", 9)
-      .attr("dy", ".35em")
-      .text("Không tham gia hoạt động ngoại khóa");
-
-    const notes = d3.select(notesRef.current);
-
-    notes
-      .append("div")
-      .attr("class", "note")
-      .html(
-        data
-          .map(
-            ({ age, withExtracurricular, withoutExtracurricular }) =>
-              `Tuổi: ${age} - Chơi: ${withExtracurricular}, Không chơi: ${withoutExtracurricular}`
+      const y = d3
+        .scaleBand()
+        .domain(
+          d3.groupSort(
+            data,
+            (D) =>
+              -D.find((d) => d.GradeClass === "2.0").numberStudent /
+              d3.sum(D, (d) => d.numberStudent),
+            (d) => d.Extracurricular
           )
-          .join("<br>")
-      );
+        )
+        .range([marginTop, height - marginBottom])
+        .padding(0.08);
 
-    return () => {
-      d3.select(svgRefStore).selectAll("*").remove();
-      d3.select(legendRefStore).selectAll("*").remove();
-      d3.select(notesRefStore).selectAll("*").remove();
+      const color = d3
+        .scaleOrdinal()
+        .domain(series.map((d) => d.key))
+        .range(d3.schemeSpectral[series.length])
+        .unknown("#ccc");
+
+      // A function to format the value in the tooltip.
+      const formatValue = (x) => (isNaN(x) ? "N/A" : x.toLocaleString("en"));
+
+      // Create the SVG container.
+      const svg_chart = d3
+        .select(svgRef.current)
+        .attr("width", width)
+        .attr("height", height)
+        .attr("viewBox", [0, 0, width, height])
+        .attr("style", "max-width: 100%; height: auto;");
+
+      // Append a group for each series, and a rect for each element in the series.
+      svg_chart
+        .append("g")
+        .selectAll()
+        .data(series)
+        .join("g")
+        .attr("fill", (d) => color(d.key))
+        .selectAll("rect")
+        .data((D) =>
+          D.map((d) => {
+            d.key = D.key;
+            return d;
+          })
+        )
+        .join("rect")
+        .attr("x", (d) => x(d[0]))
+        .attr("y", (d) => y(d.data[0]))
+        .attr("height", y.bandwidth())
+        .attr("width", (d) => x(d[1]) - x(d[0]))
+        .append("title")
+        .text(
+          (d) =>
+            `${d.data[0]} ${d.key}\n${formatValue(
+              d.data[1].get(d.key).numberStudent
+            )}`
+        );
+
+      // Append the horizontal axis.
+      svg_chart
+        .append("g")
+        .attr("transform", `translate(0,${marginTop})`)
+        .call(d3.axisTop(x).ticks(width / 100, "%"))
+        .call((g) => g.selectAll(".domain").remove());
+
+      // Append the vertical axis.
+      svg_chart
+        .append("g")
+        .attr("transform", `translate(${marginLeft},0)`)
+        .call(d3.axisLeft(y).tickSizeOuter(0))
+        .call((g) => g.selectAll(".domain").remove());
+
+      // X label
+      svg_chart
+        .append("text")
+        .attr("x", width - 220)
+        .attr("y", 30)
+        .attr("text-anchor", "middle")
+        .style("font-family", "Helvetica")
+        .style("font-size", 14)
+        .text(
+          '% Số học sinh theo "Xếp loại" và "Tham gia hoạt động ngoại khóa"'
+        );
+
+      // Y label
+      svg_chart
+        .append("text")
+        .attr("text-anchor", "middle")
+        .attr("transform", "translate(20," + 100 + ")rotate(-90)")
+        .style("font-family", "Helvetica")
+        .style("font-size", 13)
+        .text("Tham gia HĐNK (1:Có, 0:Không)");
+
+      const svg_legend = d3
+        .create("svg")
+        .attr("width", 800)
+        .attr("height", 70)
+        .attr("viewBox", [0, 0, 800, 20])
+        .attr("style", "max-width: 100%; height: auto;")
+        .attr("transform", `translate(${marginLeft}, 0)`); // Move the legend below the chart
+
+      // Append a group for each series in the legend.
+      const legend = svg_legend
+        .append("g")
+        .selectAll("g")
+        .data(series)
+        .join("g")
+        .attr("transform", (d, i) => `translate(${i * 70 + 20}, 0)`);
+
+      legend
+        .append("rect")
+        .attr("width", 19)
+        .attr("height", 19)
+        .attr("fill", (d) => color(d.key));
+
+      legend
+        .append("text")
+        .attr("x", 24)
+        .attr("y", 9.5)
+        .attr("dy", "0.35em")
+        .text((d) => {
+          const gradeClass = d.key;
+          if (gradeClass === "0.0") return "A";
+          if (gradeClass === "1.0") return "B";
+          if (gradeClass === "2.0") return "C";
+          if (gradeClass === "3.0") return "D";
+          if (gradeClass === "4.0") return "F";
+          return gradeClass;
+        });
+
+      // Append the Xếp loại label under the legend.
+      svg_legend
+        .append("text")
+        .attr("x", 170)
+        .attr("y", -12)
+        .attr("text-anchor", "middle")
+        .style("font-family", "Helvetica")
+        .style("font-size", 14)
+        .text("Xếp loại");
+      d3.select(legendRef.current).append(() => svg_legend.node());
     };
+
+    drawChart();
   }, []);
 
   return (
@@ -148,7 +266,6 @@ const Task2 = () => {
       </h2>
       <svg ref={svgRef}></svg>
       <div id="legend" ref={legendRef}></div>
-      <div id="notes" ref={notesRef}></div>
     </div>
   );
 };
