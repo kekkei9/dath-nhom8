@@ -1,0 +1,41 @@
+.chart-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.chart {
+    width: 300px;
+    height: 300px;
+    margin: 20px;
+}
+
+.chart text {
+    font-size: 12px;
+    text-anchor: middle;
+}
+
+.chart-title {
+    text-align: center;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.legend {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.legend-item {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.legend-color {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    vertical-align: middle;
+}
