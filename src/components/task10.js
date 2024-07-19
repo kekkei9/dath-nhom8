@@ -97,6 +97,7 @@ const Task10 = () => {
 
   return (
     <div>
+      <h2>Task 10: Mức độ hỗ trợ trung bình của phụ huynh của từng dân tộc</h2>
       <svg ref={svgRef}></svg>
     </div>
   );
