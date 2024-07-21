@@ -47,31 +47,30 @@ const Task8 = () => {
 
     svg.append("g").attr("class", "y axis").call(yAxis);
 
-    const barGroups = svg
-      .selectAll(".bar-group")
-      .data(data)
+    const color = d3
+      .scaleOrdinal()
+      .domain(["play", "notPlay"])
+      .range(["steelblue", "orange"]);
+
+    const stack = d3.stack().keys(["play", "notPlay"]);
+
+    const series = stack(data);
+
+    svg
+      .selectAll(".serie")
+      .data(series)
       .enter()
       .append("g")
-      .attr("class", "bar-group")
-      .attr("transform", (d) => `translate(${x(d.gender)},0)`);
-
-    barGroups
+      .attr("class", "serie")
+      .attr("fill", (d) => color(d.key))
+      .selectAll("rect")
+      .data((d) => d)
+      .enter()
       .append("rect")
-      .attr("class", "bar play")
-      .attr("x", 0)
-      .attr("y", (d) => y(d.play))
-      .attr("width", x.bandwidth())
-      .attr("height", (d) => height - y(d.play))
-      .attr("fill", "steelblue");
-
-    barGroups
-      .append("rect")
-      .attr("class", "bar not-play")
-      .attr("x", 0)
-      .attr("y", (d) => y(d.play + d.notPlay))
-      .attr("width", x.bandwidth())
-      .attr("height", (d) => height - y(d.notPlay))
-      .attr("fill", "orange");
+      .attr("x", (d) => x(d.data.gender))
+      .attr("y", (d) => y(d[1]))
+      .attr("height", (d) => y(d[0]) - y(d[1]))
+      .attr("width", x.bandwidth());
 
     const legend = d3
       .select(legendRef.current)
